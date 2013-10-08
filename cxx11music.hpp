@@ -6,12 +6,12 @@
 #include <boost/optional.hpp>
 #include <boost/rational.hpp>
 
+namespace musical {
+
 using boost::optional;
 using rational = boost::rational<int>;
 using optional_rational = optional<rational>;
 using boost::none;
-
-namespace musical {
 
 class stream;
 class object {
@@ -28,6 +28,7 @@ public:
     return active_stream? streams.at(active_stream): offset_;
   }
   rational offset(stream const &s) const { return streams.at(const_cast<stream*>(&s)); }
+  virtual rational duration() const { return {}; }
 private:
   /*for*/ friend class stream;
   void add(stream *s, rational offset) {
@@ -54,11 +55,18 @@ public:
     elements.push_back(&obj);
     obj.add(this, offset);
   }
+  rational end_offset() const {
+    rational result;
+    for (auto element: elements) {
+      rational end(element->offset(*this) + element->duration());
+      if (end > result) result = end;
+    }
+    return result;
+  }
+  void append(object &obj) { insert(end_offset(), obj); }
 };
 
-}
-
-void musical::object::remove(musical::object *o)
+void object::remove(object *o)
 {
   streams.erase(dynamic_cast<musical::stream*>(o));
   contexts.erase(o);
@@ -71,16 +79,4 @@ template<> rational operator"" _th<'3', '2'>() { return rational{1, 32}; }
 template<> rational operator"" _th<'6', '4'>() { return rational{1, 64}; }
 template<> rational operator"" _th<'1', '2', '8'>() { return rational{1, 128}; }
 
-int main()
-{
-  using namespace musical;
-  stream m1, m2;
-  note n; rest r;
-  m1.insert(4*8_th, n);
-  m2.insert(rational{}, r);
-  stream s;
-  s.insert(2*8_th, m1);
-  s.insert(4*16_th, m2);
-  std::cout << *n.offset() << ',' << m1.offset(s) << std::endl;
 }
-
