@@ -12,15 +12,15 @@ if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
                         PROPERTIES COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK)
   target_link_libraries(${CMAKE_PROJECT_NAME}test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 else(Boost_UNIT_TEST_FRAMEWORK_FOUND)
-  message("-- Boost unit test framework libraries not available")
+  message(STATUS "Boost unit test framework library not available")
 endif(Boost_UNIT_TEST_FRAMEWORK_FOUND)
-file(STRINGS test.cpp ${CMAKE_PROJECT_NAME}_BOOST_AUTO_TEST_CASES
-     REGEX "^BOOST_AUTO_TEST_CASE")
-string(REGEX REPLACE "^BOOST_AUTO_TEST_CASE\\((.*)\\).*$" "\\1"
-       ${CMAKE_PROJECT_NAME}_TEST_NAMES
-       ${${CMAKE_PROJECT_NAME}_BOOST_AUTO_TEST_CASES})
+
 enable_testing()
-foreach(test_name ${${CMAKE_PROJECT_NAME}_TEST_NAMES})
+file(STRINGS test.cpp ${CMAKE_PROJECT_NAME}_BOOST_AUTO_TEST_CASE_matches
+     REGEX "^BOOST_AUTO_TEST_CASE\\([a-zA-Z][a-zA-Z0-9_]*\\)")
+foreach(match ${${CMAKE_PROJECT_NAME}_BOOST_AUTO_TEST_CASE_matches})
+  string(REGEX REPLACE "^BOOST_AUTO_TEST_CASE\\(([a-zA-Z][a-zA-Z0-9_]*)\\).*$" "\\1"
+         test_name ${match})
   add_test(NAME ${test_name}
            COMMAND ${CMAKE_PROJECT_NAME}test --run_test=${test_name})
-endforeach(test_name)
+endforeach(match)

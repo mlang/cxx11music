@@ -14,3 +14,7 @@ BOOST_AUTO_TEST_CASE(append) {
   BOOST_REQUIRE_EQUAL(n.offset(s), rational{});
 }
 
+BOOST_AUTO_TEST_CASE(udliterals) {
+  using namespace musical;
+  BOOST_REQUIRE_EQUAL(4*16_th, rational(1, 4));
+}
