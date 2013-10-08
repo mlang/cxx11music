@@ -5,7 +5,7 @@ add_definitions(-std=c++11)
 add_executable(${CMAKE_PROJECT_NAME}test test.cpp)
 set_target_properties(${CMAKE_PROJECT_NAME}test
                       PROPERTIES COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK)
-target_link_libraries(${CMAKE_PROJECT_NAME}test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG})
+target_link_libraries(${CMAKE_PROJECT_NAME}test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 file(STRINGS test.cpp ${CMAKE_PROJECT_NAME}_BOOST_AUTO_TEST_CASES
      REGEX "^BOOST_AUTO_TEST_CASE")
 string(REGEX REPLACE "^BOOST_AUTO_TEST_CASE\\((.*)\\).*$" "\\1"
